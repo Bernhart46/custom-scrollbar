@@ -1,0 +1,21 @@
+body{
+  margin: 0;
+}
+
+.wrapper{
+  height: 100vh;
+}
+
+.scrollBarBox {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 16px;
+  border-left: solid 1px black;
+}
+.scrollNode {
+  background-color: red;
+  cursor: pointer;
+  position: relative;
+}
