@@ -1,20 +1,24 @@
 "use strict";
 const wrapper = document.querySelector(".wrapper");
-export const SCROLL_AMOUNT = 128;
 
 const METHODS = ["default", "smooth"];
 const ERROR_MESSAGES = {
-  no_element: "No element has been added to the function!",
-  wrong_method: 'Wrong method type. Method types: "default", "smooth"',
+  NO_ELEMENT: "No element has been added to the function!",
+  WRONG_METHOD: 'Wrong method type. Method types: "default", "smooth"',
+};
+
+const DEFAULT_OPTIONS = {
+  SCROLL_AMOUNT: 128,
 };
 
 class CustomScrollbar {
-  constructor(element, method = "default") {
-    if (!element) throw new Error(ERROR_MESSAGES.no_element);
-    if (!METHODS.includes(method)) throw new Error(ERROR_MESSAGES.wrong_method);
+  constructor(element, method = "default", options = DEFAULT_OPTIONS) {
+    if (!element) throw new Error(ERROR_MESSAGES.NO_ELEMENT);
+    if (!METHODS.includes(method)) throw new Error(ERROR_MESSAGES.WRONG_METHOD);
 
     this.element = element;
     this.method = method;
+    this.options = options;
 
     //PARTS
     this.scrollBarBox = null;
@@ -67,10 +71,10 @@ class CustomScrollbar {
   addEvents() {
     this.element.addEventListener("wheel", (e) => {
       if (this.method === "default") {
-        this.addToScrollTop(e, this.method);
+        this.addToScrollTop(e);
       }
       if (this.method === "smooth") {
-        animate(0, 0, SCROLL_AMOUNT, this.addToScrollTop.bind(this), e);
+        this.animate(0, 0, e);
       }
     });
 
@@ -83,7 +87,10 @@ class CustomScrollbar {
   }
 
   addToScrollTop(e) {
-    const amount = this.method === "smooth" ? SCROLL_AMOUNT / 8 : SCROLL_AMOUNT;
+    const amount =
+      this.method === "smooth"
+        ? this.options.SCROLL_AMOUNT / 8
+        : this.options.SCROLL_AMOUNT;
     this.element.scrollTop = this.calculateScrollTop(e, amount);
     this.scrollBarBox.style.top = this.element.scrollTop + "px";
     const nodeTop = this.calculateNodeTop();
@@ -132,16 +139,15 @@ class CustomScrollbar {
       return maxValue;
     }
   }
+
+  animate(_, current, e) {
+    const isAnimationOver = current >= this.options.SCROLL_AMOUNT;
+    if (!isAnimationOver) {
+      this.addToScrollTop(e);
+      current += this.options.SCROLL_AMOUNT / 8;
+      requestAnimationFrame((timeStamp) => this.animate(timeStamp, current, e));
+    }
+  }
 }
 
 new CustomScrollbar(wrapper, "smooth");
-
-function animate(_, current, max, func, attr) {
-  if (current < max) {
-    func(attr);
-    current += SCROLL_AMOUNT / 8;
-    requestAnimationFrame((timeStamp) =>
-      animate(timeStamp, current, max, func, attr)
-    );
-  }
-}
