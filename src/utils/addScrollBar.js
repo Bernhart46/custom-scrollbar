@@ -1,14 +1,24 @@
-import { scrollbar } from "../custom-scrollbar.js";
-import changeScrollNodeHeight from './changeScrollNodeHeight.js'
+import changeScrollNodeHeight from "./changeScrollNodeHeight.js";
 
 export default function addScrollBar(element) {
-  scrollbar.scrollBarBox = document.createElement("div");
-  scrollbar.scrollBarBox.classList.add("scrollBarBox");
+  //initialize parts
+  const content = element.innerHTML;
+  const contentPart = document.createElement("div");
+  const scrollPart = document.createElement("div");
+  const scrollBarNode = document.createElement("div");
 
-  scrollbar.scrollBarNode = document.createElement("div");
-  scrollbar.scrollBarNode.classList.add("scrollNode");
-  changeScrollNodeHeight(element, element.clientHeight);
+  //place the content inside the contentPart
+  element.innerHTML = "";
+  contentPart.innerHTML = content;
 
-  scrollbar.scrollBarBox.appendChild(scrollbar.scrollBarNode);
-  element.appendChild(scrollbar.scrollBarBox);
+  //add classes
+  scrollBarNode.classList.add("scrollNode");
+  scrollPart.classList.add("scrollBarBox");
+
+  //append
+  element.appendChild(contentPart);
+  scrollPart.appendChild(scrollBarNode);
+  element.appendChild(scrollPart);
+
+  return { contentPart, scrollPart, scrollBarNode };
 }
