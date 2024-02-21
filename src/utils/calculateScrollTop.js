@@ -1,6 +1,8 @@
 export default function calculateScrollTop(element, event, amount) {
-  const value = element.scrollTop + (event.deltaY < 0 ? 0 - amount : amount);
-  const maxValue = element.scrollHeight - element.clientHeight;
+  const { scrollHeight, scrollTop, clientHeight } = element;
+
+  const value = scrollTop + (event.deltaY < 0 ? 0 - amount : amount);
+  const maxValue = scrollHeight - clientHeight;
 
   if (value > 0) {
     return value;
