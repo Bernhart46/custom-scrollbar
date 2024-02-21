@@ -20,5 +20,5 @@ export default function addScrollBar(element) {
   scrollPart.appendChild(scrollBarNode);
   element.appendChild(scrollPart);
 
-  return { contentPart, scrollPart, scrollBarNode };
+  return { scrollPart, scrollBarNode };
 }

@@ -22,7 +22,7 @@ function addCustomScroll(element, method = "default") {
   if (isElementScrollable) {
     element.scrollTop = 0;
     addParentStyles(element);
-    const { contentPart, scrollPart, scrollBarNode } = addScrollBar(element);
+    const { scrollPart, scrollBarNode } = addScrollBar(element);
     scrollbar.scrollBarBox = scrollPart;
     scrollbar.scrollBarNode = scrollBarNode;
 
