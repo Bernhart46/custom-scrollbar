@@ -70,12 +70,7 @@ class CustomScrollbar {
 
   addEvents() {
     this.element.addEventListener("wheel", (e) => {
-      if (this.method === "default") {
-        this.addToScrollTop(e);
-      }
-      if (this.method === "smooth") {
-        this.animate(0, 0, e);
-      }
+      scroll(e);
     });
 
     window.addEventListener("resize", () => {
@@ -84,6 +79,33 @@ class CustomScrollbar {
       const nodeTop = this.calculateNodeTop();
       this.scrollBarNode.style.top = nodeTop + "px";
     });
+
+    //FOR MOBILE
+    // this.touchStartY;
+
+    // this.element.addEventListener("touchstart", (e) => {
+    //   this.touchStartY = e.touches[0].clientY;
+    // });
+    // this.element.addEventListener("touchmove", (e) => {
+    //   // e.preventDefault();
+
+    //   this.options.SCROLL_AMOUNT = 24;
+
+    //   const isDone = this.touchStartY;
+
+    //   scroll({
+    //     deltaY: this.touchStartY - e.touches[0].clientY,
+    //   });
+    // });
+
+    const scroll = (e) => {
+      if (this.method === "default") {
+        this.addToScrollTop(e);
+      }
+      if (this.method === "smooth") {
+        this.animate(0, 0, e);
+      }
+    };
   }
 
   addToScrollTop(e) {
