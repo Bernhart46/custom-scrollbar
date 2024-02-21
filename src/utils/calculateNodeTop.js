@@ -6,6 +6,5 @@ export default function calculateNodeTop(element){
     const realScrollHeight = element.scrollHeight - element.clientHeight;
     const nodeTop = (remainingSpace / realScrollHeight) * element.scrollTop;
 
-    console.log(element.scrollHeight);
     return nodeTop;
 }

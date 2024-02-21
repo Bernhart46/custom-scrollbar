@@ -30,7 +30,6 @@ function addCustomScroll(element, method = "default") {
   scrollbar.scrollBarNode.style.top = nodeTop + "px";
 
   element.addEventListener("wheel", (e) => {
-    //addToScrollTop(e)
     if (method === "default") {
       addToScrollTop(e, method);
     }
