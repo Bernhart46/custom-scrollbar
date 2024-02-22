@@ -12,14 +12,20 @@ const DEFAULT_OPTIONS = {
   SCROLL_SIZE: 16,
 };
 
+//It needed if I only want to change 1 variable but keep the rest
+function makeDefaultOptions(defaults, changed) {
+  return { ...defaults, ...changed };
+}
+
 class CustomScrollbar {
-  constructor(element, method = "default", options = DEFAULT_OPTIONS) {
+  constructor(element, method = "default", options) {
     if (!element) throw new Error(ERROR_MESSAGES.NO_ELEMENT);
     if (!METHODS.includes(method)) throw new Error(ERROR_MESSAGES.WRONG_METHOD);
 
     this.element = element;
     this.method = method;
-    this.options = options;
+    this.options = makeDefaultOptions(DEFAULT_OPTIONS, options);
+    console.log(this.options);
 
     //PARTS
     this.scrollBarBox = null;
@@ -219,4 +225,6 @@ class CustomScrollbar {
   }
 }
 
-new CustomScrollbar(wrapper, "smooth");
+new CustomScrollbar(wrapper, "smooth", {
+  SCROLL_SIZE: 8,
+});
