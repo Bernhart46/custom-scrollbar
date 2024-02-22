@@ -95,12 +95,15 @@ class CustomScrollbar {
         const isTooSmall = this.scrollNodeHeight <= 40;
         const realScrollNodeHeight = isTooSmall ? 40 : this.scrollNodeHeight;
         const spaceWithoutNode = clientHeight - realScrollNodeHeight;
-        const newTop =
-          cursorPos < 0
-            ? 0
-            : cursorPos >= spaceWithoutNode
-            ? spaceWithoutNode
-            : cursorPos;
+
+        let newTop = cursorPos;
+        if (cursorPos < 0) {
+          newTop = 0;
+        }
+        if (cursorPos >= spaceWithoutNode) {
+          newTop = spaceWithoutNode;
+        }
+
         this.scrollBarNode.style.top = `${newTop}px`;
 
         //scrollTop
