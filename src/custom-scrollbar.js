@@ -9,6 +9,7 @@ const ERROR_MESSAGES = {
 
 const DEFAULT_OPTIONS = {
   SCROLL_AMOUNT: 128,
+  SCROLL_SIZE: 16,
 };
 
 class CustomScrollbar {
@@ -55,9 +56,9 @@ class CustomScrollbar {
 
     this.changeScrollNodeHeight();
 
-    this.scrollBarBox.style.top = this.element.scrollTop + "px";
-    const nodeTop = this.calculateNodeTop();
-    this.scrollBarNode.style.top = nodeTop + "px";
+    // this.scrollBarBox.style.top = 0 + "px";
+    // this.scrollBarNode.style.top = 0 + "px";
+    this.contentPart.scrollTop = 0;
   }
 
   addEvents() {
@@ -149,7 +150,7 @@ class CustomScrollbar {
 
     if (this.isElementScrollable) {
       this.scrollBarBox.style.display = "block";
-      this.element.style.gridTemplateColumns = "1fr 16px";
+      this.element.style.gridTemplateColumns = `1fr ${this.options.SCROLL_SIZE}px`;
     } else {
       this.scrollBarBox.style.display = "none";
       this.element.style.gridTemplateColumns = "1fr";
@@ -177,7 +178,6 @@ class CustomScrollbar {
   addParentStyles() {
     this.element.style.boxSizing = "border-box";
     this.element.style.display = "grid";
-    this.element.style.gridTemplateColumns = "1fr 16px";
   }
 
   calculateNodeTop() {

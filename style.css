@@ -13,10 +13,11 @@ body {
 }
 .scrollBarBox {
   height: 100%;
-  border-left: solid 1px black;
+  /*border-left: solid 1px black;*/
 }
 .scrollNode {
-  background-color: red;
+  background-color: gray;
   cursor: pointer;
   position: relative;
+  border-radius: 10px;
 }
