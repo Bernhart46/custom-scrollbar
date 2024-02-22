@@ -1,9 +1,11 @@
-body{
+body {
   margin: 0;
 }
 
-.wrapper{
-  height: 100vh;
+.wrapper {
+  height: 700px;
+  border: solid blue 2px;
+  margin: 5rem;
 }
 
 .scrollBarBox {

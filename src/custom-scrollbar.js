@@ -44,20 +44,20 @@ class CustomScrollbar {
 
     //initialize parts
     const content = this.element.innerHTML;
-    const contentPart = document.createElement("div");
+    this.contentPart = document.createElement("div");
     this.scrollBarBox = document.createElement("div");
     this.scrollBarNode = document.createElement("div");
 
     //place the content inside the contentPart
     this.element.innerHTML = "";
-    contentPart.innerHTML = content;
+    this.contentPart.innerHTML = content;
 
     //add classes
     this.scrollBarNode.classList.add("scrollNode");
     this.scrollBarBox.classList.add("scrollBarBox");
 
     //append
-    this.element.appendChild(contentPart);
+    this.element.appendChild(this.contentPart);
     this.scrollBarBox.appendChild(this.scrollBarNode);
     this.element.appendChild(this.scrollBarBox);
 
@@ -78,6 +78,43 @@ class CustomScrollbar {
       this.scrollBarBox.style.top = this.element.scrollTop + "px";
       const nodeTop = this.calculateNodeTop();
       this.scrollBarNode.style.top = nodeTop + "px";
+    });
+
+    //Moving by grabbing
+    this.isGrabbed = false;
+    this.grabbedPos = 0;
+    this.scrollBarNode.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      this.isGrabbed = true;
+      this.grabbedPos = e.layerY;
+    });
+    window.addEventListener("mousemove", (e) => {
+      const { scrollHeight, clientHeight, offsetTop } = this.element;
+      if (this.isGrabbed) {
+        //calculations based on cursor position
+        const heightFraction = scrollHeight / clientHeight;
+        const relativeCursorPosition = e.clientY - offsetTop - this.grabbedPos;
+        const contentHeight = scrollHeight - clientHeight;
+
+        let newScrollTop = heightFraction * relativeCursorPosition;
+
+        //Check ends (beginning, ending)
+        if (newScrollTop < 0) {
+          newScrollTop = 0;
+        }
+        if (newScrollTop > contentHeight) {
+          newScrollTop = contentHeight;
+        }
+
+        this.element.scrollTop = newScrollTop;
+        this.scrollBarBox.style.top = newScrollTop + "px";
+        this.scrollBarNode.style.top = `${this.calculateNodeTop()}px`;
+      }
+    });
+    window.addEventListener("mouseup", (e) => {
+      if (this.isGrabbed) {
+        this.isGrabbed = false;
+      }
     });
 
     //FOR MOBILE
