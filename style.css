@@ -3,9 +3,9 @@ body {
 }
 
 .wrapper {
-  height: 200px;
+  height: 700px;
   border: solid blue 2px;
-  margin: 5rem;
+  margin: 2rem;
 }
 .contentPart {
   height: 100%;

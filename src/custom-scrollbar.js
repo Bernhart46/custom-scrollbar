@@ -25,14 +25,8 @@ class CustomScrollbar {
     this.scrollBarNode = null;
     this.scrollNodeHeight = null;
 
-    this.isElementScrollable =
-      this.element.scrollHeight > this.element.offsetHeight;
-
-    if (this.isElementScrollable) {
-      //remove scrollBar
-    }
-
     this.addScrollbar();
+    this.changeVisibility();
     this.addEvents();
   }
 
@@ -77,6 +71,8 @@ class CustomScrollbar {
       this.scrollBarBox.style.top = this.element.scrollTop + "px";
       const nodeTop = this.calculateNodeTop();
       this.scrollBarNode.style.top = nodeTop + "px";
+
+      this.changeVisibility();
     });
 
     //Moving by grabbing
@@ -146,6 +142,18 @@ class CustomScrollbar {
         this.animate(0, 0, e);
       }
     };
+  }
+  changeVisibility() {
+    const { scrollHeight, offsetHeight } = this.contentPart;
+    this.isElementScrollable = scrollHeight > offsetHeight;
+
+    if (this.isElementScrollable) {
+      this.scrollBarBox.style.display = "block";
+      this.element.style.gridTemplateColumns = "1fr 16px";
+    } else {
+      this.scrollBarBox.style.display = "none";
+      this.element.style.gridTemplateColumns = "1fr";
+    }
   }
 
   addToScrollTop(e) {
