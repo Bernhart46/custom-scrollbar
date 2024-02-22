@@ -3,17 +3,16 @@ body {
 }
 
 .wrapper {
-  height: 700px;
+  height: 200px;
   border: solid blue 2px;
   margin: 5rem;
 }
-
-.scrollBarBox {
-  position: absolute;
-  top: 0;
-  right: 0;
+.contentPart {
   height: 100%;
-  width: 16px;
+  overflow: hidden;
+}
+.scrollBarBox {
+  height: 100%;
   border-left: solid 1px black;
 }
 .scrollNode {

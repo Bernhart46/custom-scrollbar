@@ -26,14 +26,11 @@ class CustomScrollbar {
     this.scrollNodeHeight = null;
 
     this.isElementScrollable =
-      this.element.scrollHeight > this.element.clientHeight;
+      this.element.scrollHeight > this.element.offsetHeight;
 
     if (this.isElementScrollable) {
       //remove scrollBar
     }
-
-    //scrollToTheTop
-    this.element.scrollTop = 0;
 
     this.addScrollbar();
     this.addEvents();
@@ -53,6 +50,7 @@ class CustomScrollbar {
     this.contentPart.innerHTML = content;
 
     //add classes
+    this.contentPart.classList.add("contentPart");
     this.scrollBarNode.classList.add("scrollNode");
     this.scrollBarBox.classList.add("scrollBarBox");
 
@@ -70,6 +68,7 @@ class CustomScrollbar {
 
   addEvents() {
     this.element.addEventListener("wheel", (e) => {
+      e.preventDefault();
       scroll(e);
     });
 
@@ -89,28 +88,29 @@ class CustomScrollbar {
       this.grabbedPos = e.layerY;
     });
     window.addEventListener("mousemove", (e) => {
-      const { scrollHeight, clientHeight, offsetTop } = this.element;
+      const { scrollHeight, clientHeight, offsetTop } = this.contentPart;
       if (this.isGrabbed) {
-        //calculations based on cursor position
-        const heightFraction = scrollHeight / clientHeight;
-        const relativeCursorPosition = e.clientY - offsetTop - this.grabbedPos;
-        const contentHeight = scrollHeight - clientHeight;
+        const borderSize = (this.contentPart.offsetHeight - clientHeight) / 2;
+        const cursorPos = e.clientY - offsetTop - borderSize - this.grabbedPos;
+        const isTooSmall = this.scrollNodeHeight <= 40;
+        const realScrollNodeHeight = isTooSmall ? 40 : this.scrollNodeHeight;
+        const spaceWithoutNode = clientHeight - realScrollNodeHeight;
+        const newTop =
+          cursorPos < 0
+            ? 0
+            : cursorPos >= spaceWithoutNode
+            ? spaceWithoutNode
+            : cursorPos;
+        this.scrollBarNode.style.top = `${newTop}px`;
 
-        let newScrollTop = heightFraction * relativeCursorPosition;
+        //scrollTop
+        const realScrollHeight = scrollHeight - clientHeight;
+        const newScrollTop = (newTop / spaceWithoutNode) * realScrollHeight;
 
-        //Check ends (beginning, ending)
-        if (newScrollTop < 0) {
-          newScrollTop = 0;
-        }
-        if (newScrollTop > contentHeight) {
-          newScrollTop = contentHeight;
-        }
-
-        this.element.scrollTop = newScrollTop;
-        this.scrollBarBox.style.top = newScrollTop + "px";
-        this.scrollBarNode.style.top = `${this.calculateNodeTop()}px`;
+        this.contentPart.scrollTop = newScrollTop;
       }
     });
+
     window.addEventListener("mouseup", (e) => {
       if (this.isGrabbed) {
         this.isGrabbed = false;
@@ -150,14 +150,13 @@ class CustomScrollbar {
       this.method === "smooth"
         ? this.options.SCROLL_AMOUNT / 8
         : this.options.SCROLL_AMOUNT;
-    this.element.scrollTop = this.calculateScrollTop(e, amount);
-    this.scrollBarBox.style.top = this.element.scrollTop + "px";
+    this.contentPart.scrollTop = this.calculateScrollTop(e, amount);
     const nodeTop = this.calculateNodeTop();
     this.scrollBarNode.style.top = `${nodeTop}px`;
   }
 
   changeScrollNodeHeight() {
-    const { clientHeight, scrollHeight } = this.element;
+    const { clientHeight, scrollHeight } = this.contentPart;
     this.scrollNodeHeight = (clientHeight / scrollHeight) * clientHeight;
     this.scrollBarNode.style.height = `${
       this.scrollNodeHeight > 40 ? this.scrollNodeHeight : 40
@@ -166,16 +165,16 @@ class CustomScrollbar {
 
   addParentStyles() {
     this.element.style.boxSizing = "border-box";
-    this.element.style.paddingRight = "16px";
-    this.element.style.position = "relative";
-    this.element.style.overflow = "hidden";
+    this.element.style.display = "grid";
+    this.element.style.gridTemplateColumns = "1fr 16px";
   }
 
   calculateNodeTop() {
-    const { clientHeight, scrollHeight, scrollTop } = this.element;
+    const { clientHeight, scrollHeight, scrollTop } = this.contentPart;
 
     const remainingSpace =
       clientHeight - (this.scrollNodeHeight > 40 ? this.scrollNodeHeight : 40);
+
     const realScrollHeight = scrollHeight - clientHeight;
     const nodeTop = (remainingSpace / realScrollHeight) * scrollTop;
 
@@ -183,7 +182,7 @@ class CustomScrollbar {
   }
 
   calculateScrollTop(event, amount) {
-    const { scrollHeight, scrollTop, clientHeight } = this.element;
+    const { scrollHeight, scrollTop, clientHeight } = this.contentPart;
 
     const value = scrollTop + (event.deltaY < 0 ? 0 - amount : amount);
     const maxValue = scrollHeight - clientHeight;
