@@ -8,6 +8,7 @@ const ERROR_MESSAGES = {
 };
 
 const DEFAULT_OPTIONS = {
+  METHOD: "smooth",
   SCROLL_AMOUNT: 128,
   SCROLL_SIZE: 16,
 };
@@ -18,14 +19,13 @@ function makeDefaultOptions(defaults, changed) {
 }
 
 class CustomScrollbar {
-  constructor(element, method = "default", options) {
+  constructor(element, options) {
     if (!element) throw new Error(ERROR_MESSAGES.NO_ELEMENT);
-    if (!METHODS.includes(method)) throw new Error(ERROR_MESSAGES.WRONG_METHOD);
 
     this.element = element;
-    this.method = method;
     this.options = makeDefaultOptions(DEFAULT_OPTIONS, options);
-    console.log(this.options);
+    if (!METHODS.includes(this.options.METHOD))
+      throw new Error(ERROR_MESSAGES.WRONG_METHOD);
 
     //PARTS
     this.scrollBarBox = null;
@@ -142,10 +142,10 @@ class CustomScrollbar {
     // });
 
     const scroll = (e) => {
-      if (this.method === "default") {
+      if (this.options.METHOD === "default") {
         this.addToScrollTop(e);
       }
-      if (this.method === "smooth") {
+      if (this.options.METHOD === "smooth") {
         this.animate(0, 0, e);
       }
     };
@@ -165,7 +165,7 @@ class CustomScrollbar {
 
   addToScrollTop(e) {
     const amount =
-      this.method === "smooth"
+      this.options.METHOD === "smooth"
         ? this.options.SCROLL_AMOUNT / 8
         : this.options.SCROLL_AMOUNT;
     this.contentPart.scrollTop = this.calculateScrollTop(e, amount);
@@ -225,6 +225,6 @@ class CustomScrollbar {
   }
 }
 
-new CustomScrollbar(wrapper, "smooth", {
+new CustomScrollbar(wrapper, {
   SCROLL_SIZE: 8,
 });
