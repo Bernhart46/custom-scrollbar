@@ -87,8 +87,8 @@ class CustomScrollbar {
     this.H_scrollBarBox.appendChild(this.H_scrollBarNode);
     this.element.appendChild(this.H_scrollBarBox);
 
-    this.changeScrollNodeHeight();
-    this.changeScrollNodeWidth();
+    this.changeScrollNode("top");
+    this.changeScrollNode("left");
 
     this.contentPart.scrollTop = 0;
     this.contentPart.scrollLeft = 0;
@@ -205,9 +205,9 @@ class CustomScrollbar {
     const scroll = (e) => {
       if (this.options.METHOD === "default") {
         if (e.shiftKey) {
-          this.addToScrollLeft(e);
+          this.addToScroll(e, "left");
         } else {
-          this.addToScrollTop(e);
+          this.addToScroll(e, "top");
         }
       }
       if (this.options.METHOD === "smooth") {
@@ -263,57 +263,57 @@ class CustomScrollbar {
   }
 
   resizeEvent() {
-    this.changeScrollNodeHeight();
-    const nodeTop = this.calculateNodeTop();
+    this.changeScrollNode("top");
+    const nodeTop = this.calculateNode("top");
     this.V_scrollBarNode.style.top = nodeTop + "px";
 
-    this.changeScrollNodeWidth();
-    const nodeLeft = this.calculateNodeLeft();
+    this.changeScrollNode("left");
+    const nodeLeft = this.calculateNode("left");
     this.H_scrollBarNode.style.left = nodeLeft + "px";
 
     this.changeVisibility();
   }
 
-  //VERTICAL
-  addToScrollTop(e) {
+  addToScroll(e, type) {
     const { METHOD, SCROLL_AMOUNT } = this.options;
+    const isTop = type === "top";
     const amount = METHOD === "smooth" ? SCROLL_AMOUNT / 8 : SCROLL_AMOUNT;
-    this.contentPart.scrollTop = this.calculateScrollTop(e, amount);
-    const nodeTop = this.calculateNodeTop();
-    this.V_scrollBarNode.style.top = `${nodeTop}px`;
+
+    //Fused checks
+    const scrollProp = isTop ? "scrollTop" : "scrollLeft";
+    const styleProp = isTop ? "top" : "left";
+    const calcScrollFn = isTop
+      ? this.calculateScroll.bind(this, e, amount, "top")
+      : this.calculateScroll.bind(this, e, amount, "left");
+    const calcNodeFn = isTop
+      ? () => this.calculateNode("top")
+      : () => this.calculateNode("left");
+    const node = isTop ? this.V_scrollBarNode : this.H_scrollBarNode;
+
+    //Fused calls
+    this.contentPart[scrollProp] = calcScrollFn();
+    const nodePos = calcNodeFn.call(this);
+    node.style[styleProp] = `${nodePos}px`;
   }
 
-  //HORIZONTAL
-  addToScrollLeft(e) {
-    const { METHOD, SCROLL_AMOUNT } = this.options;
-    const amount = METHOD === "smooth" ? SCROLL_AMOUNT / 8 : SCROLL_AMOUNT;
-    this.contentPart.scrollLeft = this.calculateScrollLeft(e, amount);
-    const nodeLeft = this.calculateNodeLeft();
-    this.H_scrollBarNode.style.left = `${nodeLeft}px`;
-  }
+  changeScrollNode(type) {
+    const { clientSize, scrollSize } = this.getValues(type);
 
-  //VERITCAL
-  changeScrollNodeHeight() {
-    const { clientHeight, scrollHeight } = this.contentPart;
-    const oldScrollNodeHeight = this.V_scrollNodeHeight;
-    this.V_scrollNodeHeight = (clientHeight / scrollHeight) * clientHeight;
-    this.V_scrollBarNode.style.height = `${
-      this.V_scrollNodeHeight > 40 ? this.V_scrollNodeHeight : 40
+    //fused checks
+    const isTop = type === "top";
+    const scrollSizeName = isTop ? "V_scrollNodeHeight" : "H_scrollNodeWidth";
+    const size = isTop ? "height" : "width";
+    const scrollNodeName = isTop ? "V_scrollBarNode" : "H_scrollBarNode";
+    const grabbedName = isTop ? "V_grabbedPos" : "H_grabbedPos";
+
+    //fused calculations
+    const oldScrollNodeSize = this[scrollSizeName];
+    this[scrollSizeName] = (clientSize / scrollSize) * clientSize;
+    this[scrollNodeName].style[size] = `${
+      this[scrollSizeName] > 40 ? this[scrollSizeName] : 40
     }px`;
-    this.V_grabbedPos =
-      (this.V_grabbedPos / oldScrollNodeHeight) * this.V_scrollNodeHeight;
-  }
-  //HORIZONTAL
-  changeScrollNodeWidth() {
-    const { clientWidth, scrollWidth } = this.contentPart;
-    console.log(scrollWidth);
-    const oldScrollNodeWidth = this.H_scrollNodeWidth;
-    this.H_scrollNodeWidth = (clientWidth / scrollWidth) * clientWidth;
-    this.H_scrollBarNode.style.width = `${
-      this.H_scrollNodeWidth > 40 ? this.H_scrollNodeWidth : 40
-    }px`;
-    this.H_grabbedPos =
-      (this.H_grabbedPos / oldScrollNodeWidth) * this.H_scrollNodeWidth;
+    this[grabbedName] =
+      (this[grabbedName] / oldScrollNodeSize) * this[scrollSizeName];
   }
 
   addParentStyles() {
@@ -322,56 +322,27 @@ class CustomScrollbar {
     this.element.style.overflow = "hidden";
   }
 
-  //VERTICAL
-  calculateNodeTop() {
-    const { clientHeight, scrollHeight, scrollTop } = this.contentPart;
+  calculateNode(type) {
+    const { clientSize, scrollSize, scrollDirection } = this.getValues(type);
 
-    const remainingSpace =
-      clientHeight -
-      (this.V_scrollNodeHeight > 40 ? this.V_scrollNodeHeight : 40);
+    const scrollNodeSize =
+      type === "top" ? this.V_scrollNodeHeight : this.H_scrollNodeWidth;
 
-    const realScrollHeight = scrollHeight - clientHeight;
-    const nodeTop = (remainingSpace / realScrollHeight) * scrollTop;
+    //fused calculations
+    const remaingingSpace =
+      clientSize - (scrollNodeSize > 40 ? scrollNodeSize : 40);
 
-    return nodeTop;
+    const realScrollWidth = scrollSize - clientSize;
+    const nodeDirection = (remaingingSpace / realScrollWidth) * scrollDirection;
+
+    return nodeDirection;
   }
 
-  //HORIZONTAL
-  calculateNodeLeft() {
-    const { clientWidth, scrollWidth, scrollLeft } = this.contentPart;
-
-    const remainingSpace =
-      clientWidth - (this.H_scrollNodeWidth > 40 ? this.H_scrollNodeWidth : 40);
-
-    const realScrollWidth = scrollWidth - clientWidth;
-    const nodeLeft = (remainingSpace / realScrollWidth) * scrollLeft;
-
-    return nodeLeft;
-  }
-
-  //VERTICAL
-  calculateScrollTop(event, amount) {
-    const { scrollHeight, scrollTop, clientHeight } = this.contentPart;
-
-    const value = scrollTop + (event.deltaY < 0 ? 0 - amount : amount);
-    const maxValue = scrollHeight - clientHeight;
-
-    if (value > 0) {
-      return value;
-    }
-    if (value < 0) {
-      return 0;
-    }
-    if (value > maxValue) {
-      return maxValue;
-    }
-  }
-  //HORIZONTAL
-  calculateScrollLeft(event, amount) {
-    const { scrollWidth, scrollLeft, clientWidth } = this.contentPart;
-
-    const value = scrollLeft + (event.deltaY < 0 ? 0 - amount : amount);
-    const maxValue = scrollWidth - clientWidth;
+  calculateScroll(event, amount, type) {
+    const { clientSize, scrollSize, scrollDirection } = this.getValues(type);
+    //fused calculations
+    const value = scrollDirection + (event.deltaY < 0 ? 0 - amount : amount);
+    const maxValue = scrollSize - clientSize;
 
     if (value > 0) {
       return value;
@@ -388,13 +359,31 @@ class CustomScrollbar {
     const isAnimationOver = current >= this.options.SCROLL_AMOUNT;
     if (!isAnimationOver) {
       if (e.shiftKey) {
-        this.addToScrollLeft(e);
+        this.addToScroll(e, "left");
       } else {
-        this.addToScrollTop(e);
+        this.addToScroll(e, "top");
       }
       current += this.options.SCROLL_AMOUNT / 8;
       requestAnimationFrame((timeStamp) => this.animate(timeStamp, current, e));
     }
+  }
+
+  getValues(type) {
+    const {
+      scrollHeight,
+      scrollTop,
+      clientHeight,
+      scrollWidth,
+      scrollLeft,
+      clientWidth,
+    } = this.contentPart;
+    const isTop = type === "top";
+
+    const clientSize = isTop ? clientHeight : clientWidth;
+    const scrollSize = isTop ? scrollHeight : scrollWidth;
+    const scrollDirection = isTop ? scrollTop : scrollLeft;
+
+    return { clientSize, scrollSize, scrollDirection };
   }
 }
 
