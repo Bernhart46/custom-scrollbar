@@ -29,9 +29,9 @@ class CustomScrollbar {
       throw new Error(ERROR_MESSAGES.WRONG_METHOD);
 
     //PARTS
-    this.scrollBarBox = null;
-    this.scrollBarNode = null;
-    this.scrollNodeHeight = null;
+    this.V_scrollBarBox = null;
+    this.V_scrollBarNode = null;
+    this.V_scrollNodeHeight = null;
 
     this.addScrollbar();
     this.addEvents();
@@ -44,28 +44,28 @@ class CustomScrollbar {
     //initialize parts
     const content = this.element.innerHTML;
     this.contentPart = document.createElement("div");
-    this.scrollBarBox = document.createElement("div");
-    this.scrollBarNode = document.createElement("div");
+    this.V_scrollBarBox = document.createElement("div");
+    this.V_scrollBarNode = document.createElement("div");
 
     //place the content inside the contentPart
     this.element.innerHTML = "";
     this.contentPart.innerHTML = content;
 
     //TEST FUNCTION
-    setTimeout(() => {
-      this.contentPart.innerHTML = content + content;
-      this.resizeEvent();
-    }, 2000);
+    // setTimeout(() => {
+    //   this.contentPart.innerHTML = content + content;
+    //   this.resizeEvent();
+    // }, 2000);
 
     //add classes
     this.contentPart.classList.add("contentPart");
-    this.scrollBarNode.classList.add("scrollNode");
-    this.scrollBarBox.classList.add("scrollBarBox");
+    this.V_scrollBarNode.classList.add("scrollNode");
+    this.V_scrollBarBox.classList.add("scrollBarBox");
 
     //append
     this.element.appendChild(this.contentPart);
-    this.scrollBarBox.appendChild(this.scrollBarNode);
-    this.element.appendChild(this.scrollBarBox);
+    this.V_scrollBarBox.appendChild(this.V_scrollBarNode);
+    this.element.appendChild(this.V_scrollBarBox);
 
     this.changeScrollNodeHeight();
 
@@ -85,7 +85,7 @@ class CustomScrollbar {
     //Moving by grabbing
     this.isGrabbed = false;
     this.grabbedPos = 0;
-    this.scrollBarNode.addEventListener("mousedown", (e) => {
+    this.V_scrollBarNode.addEventListener("mousedown", (e) => {
       e.preventDefault();
       this.isGrabbed = true;
       this.grabbedPos = e.layerY;
@@ -95,8 +95,8 @@ class CustomScrollbar {
       if (this.isGrabbed) {
         const borderSize = (this.contentPart.offsetHeight - clientHeight) / 2;
         const cursorPos = e.clientY - offsetTop - borderSize - this.grabbedPos;
-        const isTooSmall = this.scrollNodeHeight <= 40;
-        const realScrollNodeHeight = isTooSmall ? 40 : this.scrollNodeHeight;
+        const isTooSmall = this.V_scrollNodeHeight <= 40;
+        const realScrollNodeHeight = isTooSmall ? 40 : this.V_scrollNodeHeight;
         const spaceWithoutNode = clientHeight - realScrollNodeHeight;
 
         let newTop = cursorPos;
@@ -107,7 +107,7 @@ class CustomScrollbar {
           newTop = spaceWithoutNode;
         }
 
-        this.scrollBarNode.style.top = `${newTop}px`;
+        this.V_scrollBarNode.style.top = `${newTop}px`;
 
         //scrollTop
         const realScrollHeight = scrollHeight - clientHeight;
@@ -160,12 +160,12 @@ class CustomScrollbar {
     const gridValue = isRight ? `1fr ${SCROLL_SIZE}px` : `${SCROLL_SIZE}px 1fr`;
 
     if (this.isElementScrollable) {
-      this.scrollBarBox.style.display = "block";
+      this.V_scrollBarBox.style.display = "block";
       this.element.style.gridTemplateColumns = gridValue;
-      this.scrollBarBox.style.order = isRight ? 1 : 0;
+      this.V_scrollBarBox.style.order = isRight ? 1 : 0;
       this.contentPart.style.order = isRight ? 0 : 1;
     } else {
-      this.scrollBarBox.style.display = "none";
+      this.V_scrollBarBox.style.display = "none";
       this.element.style.gridTemplateColumns = "1fr";
     }
   }
@@ -173,7 +173,7 @@ class CustomScrollbar {
   resizeEvent() {
     this.changeScrollNodeHeight();
     const nodeTop = this.calculateNodeTop();
-    this.scrollBarNode.style.top = nodeTop + "px";
+    this.V_scrollBarNode.style.top = nodeTop + "px";
 
     this.changeVisibility();
   }
@@ -185,18 +185,18 @@ class CustomScrollbar {
         : this.options.SCROLL_AMOUNT;
     this.contentPart.scrollTop = this.calculateScrollTop(e, amount);
     const nodeTop = this.calculateNodeTop();
-    this.scrollBarNode.style.top = `${nodeTop}px`;
+    this.V_scrollBarNode.style.top = `${nodeTop}px`;
   }
 
   changeScrollNodeHeight() {
     const { clientHeight, scrollHeight } = this.contentPart;
-    const oldScrollNodeHeight = this.scrollNodeHeight;
-    this.scrollNodeHeight = (clientHeight / scrollHeight) * clientHeight;
-    this.scrollBarNode.style.height = `${
-      this.scrollNodeHeight > 40 ? this.scrollNodeHeight : 40
+    const oldScrollNodeHeight = this.V_scrollNodeHeight;
+    this.V_scrollNodeHeight = (clientHeight / scrollHeight) * clientHeight;
+    this.V_scrollBarNode.style.height = `${
+      this.V_scrollNodeHeight > 40 ? this.V_scrollNodeHeight : 40
     }px`;
     this.grabbedPos =
-      (this.grabbedPos / oldScrollNodeHeight) * this.scrollNodeHeight;
+      (this.grabbedPos / oldScrollNodeHeight) * this.V_scrollNodeHeight;
   }
 
   addParentStyles() {
@@ -209,7 +209,8 @@ class CustomScrollbar {
     const { clientHeight, scrollHeight, scrollTop } = this.contentPart;
 
     const remainingSpace =
-      clientHeight - (this.scrollNodeHeight > 40 ? this.scrollNodeHeight : 40);
+      clientHeight -
+      (this.V_scrollNodeHeight > 40 ? this.V_scrollNodeHeight : 40);
 
     const realScrollHeight = scrollHeight - clientHeight;
     const nodeTop = (remainingSpace / realScrollHeight) * scrollTop;
@@ -244,4 +245,6 @@ class CustomScrollbar {
   }
 }
 
-new CustomScrollbar(wrapper, {});
+new CustomScrollbar(wrapper, {
+  SCROLL_SIZE: 8,
+});

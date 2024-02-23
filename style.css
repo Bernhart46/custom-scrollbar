@@ -2,11 +2,6 @@ body {
   margin: 0;
 }
 
-.wrapper {
-  height: 700px;
-  border: solid blue 2px;
-  margin: 2rem;
-}
 .contentPart {
   height: 100%;
   overflow: hidden;
@@ -20,4 +15,18 @@ body {
   cursor: pointer;
   position: relative;
   border-radius: 10px;
+}
+
+/* CUSTOM */
+.wrapper {
+  height: 700px;
+  border: solid blue 2px;
+  margin: 2rem;
+}
+
+.content {
+  height: 800px;
+  width: 2000px;
+  background-color: aqua;
+  margin: 3rem;
 }
