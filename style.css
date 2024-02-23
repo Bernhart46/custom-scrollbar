@@ -6,15 +6,26 @@ body {
   height: 100%;
   overflow: hidden;
 }
-.scrollBarBox {
+.V_scrollBarBox {
   height: 100%;
-  /*border-left: solid 1px black;*/
+  border-left: solid 1px black;
 }
-.scrollNode {
+.V_scrollNode {
   background-color: gray;
   cursor: pointer;
   position: relative;
   border-radius: 10px;
+}
+
+.H_scrollBarBox {
+  border-top: solid 1px black;
+}
+.H_scrollNode {
+  background-color: gray;
+  cursor: pointer;
+  position: relative;
+  border-radius: 10px;
+  height: 100%;
 }
 
 /* CUSTOM */
@@ -26,7 +37,7 @@ body {
 
 .content {
   height: 800px;
-  width: 2000px;
+  width: 1500px;
   background-color: aqua;
   margin: 3rem;
 }
