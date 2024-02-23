@@ -14,17 +14,20 @@ const DEFAULT_OPTIONS = {
   HORIZONTAL_FLOAT: "bottom",
   VERTICAL_BOX_STYLES: `
     height: 100%;
-    border-left: solid 1px black;
   `,
-  HORIZONTAL_BOX_STYLES: `
-    border-top: solid 1px black;
-  `,
+  VERTICAL_BOX_STYLES_HOVER: ``,
+  VERTICAL_BOX_STYLES_ACTIVE: ``,
+  HORIZONTAL_BOX_STYLES: ``,
+  HORIZONTAL_BOX_STYLES_HOVER: ``,
+  HORIZONTAL_BOX_STYLES_ACTIVE: ``,
   VERTICAL_NODE_STYLES: `
     background-color: gray;
     cursor: pointer;
     position: relative;
     border-radius: 10px;
   `,
+  VERTICAL_NODE_STYLES_HOVER: ``,
+  VERTICAL_NODE_STYLES_ACTIVE: ``,
   HORIZONTAL_NODE_STYLES: `
     background-color: gray;
     cursor: pointer;
@@ -32,9 +35,13 @@ const DEFAULT_OPTIONS = {
     border-radius: 10px;
     height: 100%;
   `,
+  HORIZONTAL_NODE_STYLES_HOVER: ``,
+  HORIZONTAL_NODE_STYLES_ACTIVE: ``,
   CORNER_STYLES: `
     background-color: red;
   `,
+  CORNER_STYLES_HOVER: ``,
+  CORNER_STYLES_ACTIVE: ``,
 };
 
 //It needed if I only want to change 1 variable but keep the rest
@@ -62,6 +69,7 @@ class CustomScrollbar {
 
     this.addScrollbar();
     this.addEvents();
+    this.addCSSPseudo();
     this.changeVisibility();
   }
 
@@ -92,7 +100,7 @@ class CustomScrollbar {
     //add classes
     this.contentPart.style.cssText = `
       overflow: hidden;
-      height: 100%
+      height: 100%;
     `;
 
     const {
@@ -249,6 +257,93 @@ class CustomScrollbar {
       }
     };
   }
+
+  addCSSPseudo() {
+    const {
+      VERTICAL_BOX_STYLES_ACTIVE,
+      VERTICAL_BOX_STYLES_HOVER,
+      VERTICAL_NODE_STYLES_ACTIVE,
+      VERTICAL_NODE_STYLES_HOVER,
+      HORIZONTAL_BOX_STYLES_ACTIVE,
+      HORIZONTAL_BOX_STYLES_HOVER,
+      HORIZONTAL_NODE_STYLES_ACTIVE,
+      HORIZONTAL_NODE_STYLES_HOVER,
+      CORNER_STYLES_ACTIVE,
+      CORNER_STYLES_HOVER,
+    } = this.options;
+
+    function setupEventListeners(element, styles, positionProperty) {
+      let initialStylesHover, initialStylesActive;
+
+      element.addEventListener("mouseover", (event) => {
+        if (event.target === element) {
+          initialStylesHover = element.style.cssText;
+          element.style.cssText += styles.hover;
+        }
+      });
+
+      element.addEventListener("mouseout", (event) => {
+        const positionValue = element.style[positionProperty] || "0px";
+        if (event.target === element) {
+          element.style.cssText = initialStylesHover;
+          element.style[positionProperty] = positionValue;
+        }
+      });
+
+      element.addEventListener("mousedown", (event) => {
+        if (event.target === element) {
+          initialStylesActive = element.style.cssText;
+          element.style.cssText += styles.active;
+        }
+      });
+
+      element.addEventListener("mouseup", (event) => {
+        const positionValue = element.style[positionProperty] || "0px";
+        if (event.target === element) {
+          element.style.cssText = initialStylesActive;
+          element.style[positionProperty] = positionValue;
+        }
+      });
+    }
+
+    setupEventListeners(this.cornerNode, {
+      hover: CORNER_STYLES_HOVER,
+      active: CORNER_STYLES_ACTIVE,
+    });
+
+    //vertical box
+    setupEventListeners(this.V_scrollBarBox, {
+      hover: VERTICAL_BOX_STYLES_HOVER,
+      active: VERTICAL_BOX_STYLES_ACTIVE,
+    });
+
+    //vertical node
+    setupEventListeners(
+      this.V_scrollBarNode,
+      {
+        hover: VERTICAL_NODE_STYLES_HOVER,
+        active: VERTICAL_NODE_STYLES_ACTIVE,
+      },
+      "top"
+    );
+
+    //horizontal box
+    setupEventListeners(this.H_scrollBarBox, {
+      hover: HORIZONTAL_BOX_STYLES_HOVER,
+      active: HORIZONTAL_BOX_STYLES_ACTIVE,
+    });
+
+    //horizontal node
+    setupEventListeners(
+      this.H_scrollBarNode,
+      {
+        hover: HORIZONTAL_NODE_STYLES_HOVER,
+        active: HORIZONTAL_NODE_STYLES_ACTIVE,
+      },
+      "left"
+    );
+  }
+
   changeVisibility() {
     const { scrollHeight, scrollWidth } = this.contentPart;
     const { VERTICAL_FLOAT, SCROLL_SIZE, HORIZONTAL_FLOAT } = this.options;
@@ -424,6 +519,21 @@ class CustomScrollbar {
 new CustomScrollbar(wrapper, {
   SCROLL_SIZE: 8,
   CORNER_STYLES: `
+  `,
+  CORNER_STYLES_HOVER: `
+    background-color: red;
+    cursor: pointer;
+  `,
+  CORNER_STYLES_ACTIVE: `
+    background-color: green;
+  `,
+  VERTICAL_BOX_STYLES_HOVER: `
     background-color: blue;
+  `,
+  VERTICAL_BOX_STYLES_ACTIVE: `
+    background-color: red;
+  `,
+  VERTICAL_NODE_STYLES_HOVER: `
+    background-color: green;
   `,
 });

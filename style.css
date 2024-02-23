@@ -13,4 +13,5 @@ body {
   width: 1500px;
   background-color: aqua;
   margin: 3rem;
+  border: solid red 5px;
 }
