@@ -11,6 +11,7 @@ const DEFAULT_OPTIONS = {
   METHOD: "smooth",
   SCROLL_AMOUNT: 128,
   SCROLL_SIZE: 16,
+  VERTICAL_FLOAT: "right",
 };
 
 //It needed if I only want to change 1 variable but keep the rest
@@ -151,11 +152,18 @@ class CustomScrollbar {
   }
   changeVisibility() {
     const { scrollHeight } = this.contentPart;
+    const { VERTICAL_FLOAT, SCROLL_SIZE } = this.options;
     this.isElementScrollable = scrollHeight > this.element.offsetHeight;
+
+    const isRight = VERTICAL_FLOAT === "right";
+
+    const gridValue = isRight ? `1fr ${SCROLL_SIZE}px` : `${SCROLL_SIZE}px 1fr`;
 
     if (this.isElementScrollable) {
       this.scrollBarBox.style.display = "block";
-      this.element.style.gridTemplateColumns = `1fr ${this.options.SCROLL_SIZE}px`;
+      this.element.style.gridTemplateColumns = gridValue;
+      this.scrollBarBox.style.order = isRight ? 1 : 0;
+      this.contentPart.style.order = isRight ? 0 : 1;
     } else {
       this.scrollBarBox.style.display = "none";
       this.element.style.gridTemplateColumns = "1fr";
@@ -236,6 +244,4 @@ class CustomScrollbar {
   }
 }
 
-new CustomScrollbar(wrapper, {
-  SCROLL_SIZE: 8,
-});
+new CustomScrollbar(wrapper, {});
