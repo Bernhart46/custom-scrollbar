@@ -33,8 +33,8 @@ class CustomScrollbar {
     this.scrollNodeHeight = null;
 
     this.addScrollbar();
-    this.changeVisibility();
     this.addEvents();
+    this.changeVisibility();
   }
 
   addScrollbar() {
@@ -150,8 +150,8 @@ class CustomScrollbar {
     };
   }
   changeVisibility() {
-    const { scrollHeight, offsetHeight } = this.contentPart;
-    this.isElementScrollable = scrollHeight > offsetHeight;
+    const { scrollHeight } = this.contentPart;
+    this.isElementScrollable = scrollHeight > this.element.offsetHeight;
 
     if (this.isElementScrollable) {
       this.scrollBarBox.style.display = "block";
@@ -164,7 +164,6 @@ class CustomScrollbar {
 
   resizeEvent() {
     this.changeScrollNodeHeight();
-    this.scrollBarBox.style.top = this.element.scrollTop + "px";
     const nodeTop = this.calculateNodeTop();
     this.scrollBarNode.style.top = nodeTop + "px";
 
@@ -192,6 +191,7 @@ class CustomScrollbar {
   addParentStyles() {
     this.element.style.boxSizing = "border-box";
     this.element.style.display = "grid";
+    this.element.style.overflow = "hidden";
   }
 
   calculateNodeTop() {
