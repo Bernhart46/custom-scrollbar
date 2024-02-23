@@ -1,6 +1,5 @@
 "use strict";
 const wrapper = document.querySelector(".wrapper");
-
 const METHODS = ["default", "smooth"];
 const ERROR_MESSAGES = {
   NO_ELEMENT: "No element has been added to the function!",
@@ -13,6 +12,29 @@ const DEFAULT_OPTIONS = {
   SCROLL_SIZE: 16,
   VERTICAL_FLOAT: "right",
   HORIZONTAL_FLOAT: "bottom",
+  VERTICAL_BOX_STYLES: `
+    height: 100%;
+    border-left: solid 1px black;
+  `,
+  HORIZONTAL_BOX_STYLES: `
+    border-top: solid 1px black;
+  `,
+  VERTICAL_NODE_STYLES: `
+    background-color: gray;
+    cursor: pointer;
+    position: relative;
+    border-radius: 10px;
+  `,
+  HORIZONTAL_NODE_STYLES: `
+    background-color: gray;
+    cursor: pointer;
+    position: relative;
+    border-radius: 10px;
+    height: 100%;
+  `,
+  CORNER_STYLES: `
+    background-color: red;
+  `,
 };
 
 //It needed if I only want to change 1 variable but keep the rest
@@ -68,14 +90,26 @@ class CustomScrollbar {
     // }, 2000);
 
     //add classes
-    this.contentPart.classList.add("contentPart");
-    this.V_scrollBarNode.classList.add("V_scrollNode");
-    this.V_scrollBarBox.classList.add("V_scrollBarBox");
+    this.contentPart.style.cssText = `
+      overflow: hidden;
+      height: 100%
+    `;
 
-    this.cornerNode.classList.add("cornerNode");
+    const {
+      VERTICAL_BOX_STYLES,
+      VERTICAL_NODE_STYLES,
+      HORIZONTAL_BOX_STYLES,
+      HORIZONTAL_NODE_STYLES,
+      CORNER_STYLES,
+    } = this.options;
 
-    this.H_scrollBarNode.classList.add("H_scrollNode");
-    this.H_scrollBarBox.classList.add("H_scrollBarBox");
+    this.V_scrollBarBox.style.cssText = VERTICAL_BOX_STYLES;
+    this.V_scrollBarNode.style.cssText = VERTICAL_NODE_STYLES;
+
+    this.cornerNode.style.cssText = CORNER_STYLES;
+
+    this.H_scrollBarBox.style.cssText = HORIZONTAL_BOX_STYLES;
+    this.H_scrollBarNode.style.cssText = HORIZONTAL_NODE_STYLES;
 
     //append
     this.element.appendChild(this.contentPart);
@@ -389,4 +423,7 @@ class CustomScrollbar {
 
 new CustomScrollbar(wrapper, {
   SCROLL_SIZE: 8,
+  CORNER_STYLES: `
+    background-color: blue;
+  `,
 });

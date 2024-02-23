@@ -2,33 +2,6 @@ body {
   margin: 0;
 }
 
-.contentPart {
-  height: 100%;
-  overflow: hidden;
-}
-.V_scrollBarBox {
-  height: 100%;
-  border-left: solid 1px black;
-}
-.V_scrollNode {
-  background-color: gray;
-  cursor: pointer;
-  position: relative;
-  border-radius: 10px;
-}
-
-.H_scrollBarBox {
-  border-top: solid 1px black;
-}
-.H_scrollNode {
-  background-color: gray;
-  cursor: pointer;
-  position: relative;
-  border-radius: 10px;
-  height: 100%;
-}
-
-/* CUSTOM */
 .wrapper {
   height: 700px;
   border: solid blue 2px;
