@@ -182,10 +182,13 @@ class CustomScrollbar {
 
   changeScrollNodeHeight() {
     const { clientHeight, scrollHeight } = this.contentPart;
+    const oldScrollNodeHeight = this.scrollNodeHeight;
     this.scrollNodeHeight = (clientHeight / scrollHeight) * clientHeight;
     this.scrollBarNode.style.height = `${
       this.scrollNodeHeight > 40 ? this.scrollNodeHeight : 40
     }px`;
+    this.grabbedPos =
+      (this.grabbedPos / oldScrollNodeHeight) * this.scrollNodeHeight;
   }
 
   addParentStyles() {
