@@ -50,6 +50,12 @@ class CustomScrollbar {
     this.element.innerHTML = "";
     this.contentPart.innerHTML = content;
 
+    //TEST FUNCTION
+    setTimeout(() => {
+      this.contentPart.innerHTML = content + content;
+      this.resizeEvent();
+    }, 2000);
+
     //add classes
     this.contentPart.classList.add("contentPart");
     this.scrollBarNode.classList.add("scrollNode");
@@ -73,14 +79,7 @@ class CustomScrollbar {
       scroll(e);
     });
 
-    window.addEventListener("resize", () => {
-      this.changeScrollNodeHeight();
-      this.scrollBarBox.style.top = this.element.scrollTop + "px";
-      const nodeTop = this.calculateNodeTop();
-      this.scrollBarNode.style.top = nodeTop + "px";
-
-      this.changeVisibility();
-    });
+    window.addEventListener("resize", this.resizeEvent.bind(this));
 
     //Moving by grabbing
     this.isGrabbed = false;
@@ -161,6 +160,15 @@ class CustomScrollbar {
       this.scrollBarBox.style.display = "none";
       this.element.style.gridTemplateColumns = "1fr";
     }
+  }
+
+  resizeEvent() {
+    this.changeScrollNodeHeight();
+    this.scrollBarBox.style.top = this.element.scrollTop + "px";
+    const nodeTop = this.calculateNodeTop();
+    this.scrollBarNode.style.top = nodeTop + "px";
+
+    this.changeVisibility();
   }
 
   addToScrollTop(e) {
