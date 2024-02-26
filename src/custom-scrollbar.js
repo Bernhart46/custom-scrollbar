@@ -229,20 +229,12 @@ class CustomScrollbar {
     window.addEventListener("keydown", (e) => {
       if (!this.isHover) return;
 
-      switch (e.key) {
-        case "ArrowUp":
-          scroll(e, false, false);
-          break;
-        case "ArrowDown":
-          scroll(e, false, true);
-          break;
-        case "ArrowLeft":
-          scroll(e, true, false);
-          break;
-        case "ArrowRight":
-          scroll(e, true, true);
-          break;
-      }
+      keyboardSupport(e);
+    });
+
+    this.element.addEventListener("keydown", (e) => {
+      if (this.isHover) return;
+      keyboardSupport(e);
     });
 
     //FOR MOBILE
@@ -262,6 +254,23 @@ class CustomScrollbar {
     //     deltaY: this.touchStartY - e.touches[0].clientY,
     //   });
     // });
+
+    const keyboardSupport = (e) => {
+      switch (e.key) {
+        case "ArrowUp":
+          scroll(e, false, false);
+          break;
+        case "ArrowDown":
+          scroll(e, false, true);
+          break;
+        case "ArrowLeft":
+          scroll(e, true, false);
+          break;
+        case "ArrowRight":
+          scroll(e, true, true);
+          break;
+      }
+    };
 
     const scroll = (e, isHorizontal, delta) => {
       let shiftKey = isHorizontal || e.shiftKey;
