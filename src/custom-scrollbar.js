@@ -71,6 +71,9 @@ class CustomScrollbar {
     this.addEvents();
     this.addCSSPseudo();
     this.changeVisibility();
+
+    this.changeScrollNode("top");
+    this.changeScrollNode("left");
   }
 
   addScrollbar() {
@@ -128,9 +131,6 @@ class CustomScrollbar {
 
     this.H_scrollBarBox.appendChild(this.H_scrollBarNode);
     this.element.appendChild(this.H_scrollBarBox);
-
-    this.changeScrollNode("top");
-    this.changeScrollNode("left");
 
     this.contentPart.scrollTop = 0;
     this.contentPart.scrollLeft = 0;
