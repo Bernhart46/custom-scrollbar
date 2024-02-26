@@ -265,8 +265,11 @@ class CustomScrollbar {
     function setupEventListeners(element, styles, positionProperty) {
       let initialStylesHover, initialStylesActive;
 
+      let isActive = false;
+      let activeElement = null;
+
       element.addEventListener("mouseover", (event) => {
-        if (event.target === element) {
+        if (event.target === element && !isActive) {
           initialStylesHover = element.style.cssText;
           element.style.cssText += styles.hover;
         }
@@ -274,24 +277,37 @@ class CustomScrollbar {
 
       element.addEventListener("mouseout", (event) => {
         const positionValue = element.style[positionProperty] || "0px";
-        if (event.target === element) {
+        if (event.target === element && !isActive) {
           element.style.cssText = initialStylesHover;
           element.style[positionProperty] = positionValue;
         }
       });
 
       element.addEventListener("mousedown", (event) => {
+        event.preventDefault();
         if (event.target === element) {
           initialStylesActive = element.style.cssText;
           element.style.cssText += styles.active;
+          isActive = true;
+          activeElement = element;
         }
       });
 
-      element.addEventListener("mouseup", (event) => {
-        const positionValue = element.style[positionProperty] || "0px";
-        if (event.target === element) {
-          element.style.cssText = initialStylesActive;
-          element.style[positionProperty] = positionValue;
+      window.addEventListener("mouseup", (event) => {
+        if (element === activeElement) {
+          if (element !== event.target) {
+            const positionValue =
+              activeElement.style[positionProperty] || "0px";
+            activeElement.style.cssText = initialStylesHover;
+            activeElement.style[positionProperty] = positionValue;
+            isActive = false;
+          } else {
+            const positionValue =
+              activeElement.style[positionProperty] || "0px";
+            activeElement.style.cssText = initialStylesActive;
+            activeElement.style[positionProperty] = positionValue;
+            isActive = false;
+          }
         }
       });
     }
@@ -507,7 +523,7 @@ class CustomScrollbar {
 }
 
 new CustomScrollbar(wrapper, {
-  SCROLL_SIZE: 8,
+  SCROLL_SIZE: 16,
   CORNER_STYLES: `
   `,
   CORNER_STYLES_HOVER: `
