@@ -67,6 +67,8 @@ class CustomScrollbar {
     this.H_scrollBarNode = null;
     this.H_scrollNodeWidth = null;
 
+    this.isHover = false;
+
     this.addScrollbar();
     this.addEvents();
     this.addCSSPseudo();
@@ -216,6 +218,33 @@ class CustomScrollbar {
       }
     });
 
+    this.element.addEventListener("mouseenter", () => {
+      this.isHover = true;
+    });
+    this.element.addEventListener("mouseleave", () => {
+      this.isHover = false;
+    });
+
+    //KEYBOARD SUPPORT
+    window.addEventListener("keydown", (e) => {
+      if (!this.isHover) return;
+
+      switch (e.key) {
+        case "ArrowUp":
+          scroll(e, false, false);
+          break;
+        case "ArrowDown":
+          scroll(e, false, true);
+          break;
+        case "ArrowLeft":
+          scroll(e, true, false);
+          break;
+        case "ArrowRight":
+          scroll(e, true, true);
+          break;
+      }
+    });
+
     //FOR MOBILE
     // this.touchStartY;
 
@@ -234,16 +263,23 @@ class CustomScrollbar {
     //   });
     // });
 
-    const scroll = (e) => {
+    const scroll = (e, isHorizontal, delta) => {
+      let shiftKey = isHorizontal || e.shiftKey;
+      let deltaY = delta ? 1 : -1;
       if (this.options.METHOD === "default") {
-        if (e.shiftKey) {
+        if (dir) {
           this.addToScroll(e, "left");
         } else {
           this.addToScroll(e, "top");
         }
       }
       if (this.options.METHOD === "smooth") {
-        this.animate(0, 0, e);
+        const ev = {
+          ...e,
+          deltaY: e.deltaY || deltaY,
+          shiftKey: e.shiftKey || shiftKey,
+        };
+        this.animate(0, 0, ev);
       }
     };
   }
