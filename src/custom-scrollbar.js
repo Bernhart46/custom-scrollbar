@@ -162,59 +162,49 @@ class CustomScrollbar {
       this.H_grabbedPos = e.layerX;
     });
     window.addEventListener("mousemove", (e) => {
-      const { scrollHeight, clientHeight, offsetTop } = this.contentPart;
-      const { scrollWidth, clientWidth, offsetLeft } = this.contentPart;
-      //VERTICAL
-      if (this.V_isGrabbed) {
-        const borderSize = (this.contentPart.offsetHeight - clientHeight) / 2;
-        const cursorPos =
-          e.clientY - offsetTop - borderSize - this.V_grabbedPos;
-        const isTooSmall = this.V_scrollNodeHeight <= 40;
-        const realScrollNodeHeight = isTooSmall ? 40 : this.V_scrollNodeHeight;
-        const spaceWithoutNode = clientHeight - realScrollNodeHeight;
+      const { scrollHeight, clientHeight, offsetTop, offsetHeight } =
+        this.contentPart;
+      const { scrollWidth, clientWidth, offsetLeft, offsetWidth } =
+        this.contentPart;
 
-        let newTop = cursorPos;
-        if (cursorPos < 0) {
-          newTop = 0;
-        }
-        if (cursorPos >= spaceWithoutNode) {
-          newTop = spaceWithoutNode;
-        }
+      const isVertical = this.V_isGrabbed;
+      if (!isVertical && !this.H_isGrabbed) return;
+      const grabbedPos = isVertical ? this.V_grabbedPos : this.H_grabbedPos;
+      const clientPos = isVertical ? e.clientY : e.clientX;
+      const scrollSize = isVertical ? scrollHeight : scrollWidth;
+      const clientSize = isVertical ? clientHeight : clientWidth;
+      const offsetDirection = isVertical ? offsetTop : offsetLeft;
+      const offsetSize = isVertical ? offsetHeight : offsetWidth;
+      const scrollNodeSize = isVertical
+        ? this.V_scrollNodeHeight
+        : this.H_scrollNodeWidth;
+      const scrollBarNode = isVertical
+        ? this.V_scrollBarNode
+        : this.H_scrollBarNode;
 
-        this.V_scrollBarNode.style.top = `${newTop}px`;
+      const borderSize = (offsetSize - clientSize) / 2;
+      const cursorPos = clientPos - offsetDirection - borderSize - grabbedPos;
+      const isTooSmall = scrollNodeSize <= 40;
+      const realScrollNodeSize = isTooSmall ? 40 : scrollNodeSize;
+      const spaceWithoutNode = clientSize - realScrollNodeSize;
 
-        //scrollTop
-        const realScrollHeight = scrollHeight - clientHeight;
-        const newScrollTop = (newTop / spaceWithoutNode) * realScrollHeight;
-
-        this.contentPart.scrollTop = newScrollTop;
+      let newDirection = cursorPos;
+      if (cursorPos < 0) {
+        newDirection = 0;
+      }
+      if (cursorPos >= spaceWithoutNode) {
+        newDirection = spaceWithoutNode;
       }
 
-      //HORIZONTAL
-      if (this.H_isGrabbed) {
-        const borderSize = (this.contentPart.offsetWidth - clientWidth) / 2;
-        const cursorPos =
-          e.clientX - offsetLeft - borderSize - this.H_grabbedPos;
-        const isTooSmall = this.H_scrollNodeWidth <= 40;
-        const realScrollNodeWidth = isTooSmall ? 40 : this.H_scrollNodeWidth;
-        const spaceWithoutNode = clientWidth - realScrollNodeWidth;
+      scrollBarNode.style[isVertical ? "top" : "left"] = `${newDirection}px`;
 
-        let newLeft = cursorPos;
-        if (cursorPos < 0) {
-          newLeft = 0;
-        }
-        if (cursorPos >= spaceWithoutNode) {
-          newLeft = spaceWithoutNode;
-        }
+      //scrollDirection
+      const realScrollSize = scrollSize - clientSize;
+      const newScrollDirection =
+        (newDirection / spaceWithoutNode) * realScrollSize;
 
-        this.H_scrollBarNode.style.left = `${newLeft}px`;
-
-        //scrollTop
-        const realScrollWidth = scrollWidth - clientWidth;
-        const newScrollLeft = (newLeft / spaceWithoutNode) * realScrollWidth;
-
-        this.contentPart.scrollLeft = newScrollLeft;
-      }
+      this.contentPart[isVertical ? "scrollTop" : "scrollLeft"] =
+        newScrollDirection;
     });
 
     window.addEventListener("mouseup", (e) => {
@@ -535,5 +525,8 @@ new CustomScrollbar(wrapper, {
   `,
   VERTICAL_NODE_STYLES_HOVER: `
     background-color: green;
+  `,
+  VERTICAL_NODE_STYLES_ACTIVE: `
+    background-color: red;
   `,
 });
