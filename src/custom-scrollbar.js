@@ -67,6 +67,8 @@ class CustomScrollbar {
     this.H_scrollBarNode = null;
     this.H_scrollNodeWidth = null;
 
+    this.middleClickStarter = null;
+
     this.isHover = false;
 
     this.addScrollbar();
@@ -80,12 +82,12 @@ class CustomScrollbar {
 
   addScrollbar() {
     this.addParentStyles();
-
     //initialize parts
     const content = this.element.innerHTML;
     this.contentPart = document.createElement("div");
     this.V_scrollBarBox = document.createElement("div");
     this.V_scrollBarNode = document.createElement("div");
+    this.middleClickStarter = document.createElement("div");
 
     this.cornerNode = document.createElement("div");
 
@@ -106,6 +108,15 @@ class CustomScrollbar {
     this.contentPart.style.cssText = `
       overflow: hidden;
       height: 100%;
+    `;
+
+    this.middleClickStarter.style.cssText = `
+      position:absolute;
+      width: 5px;
+      height: 5px;
+      background-color: black;
+      border-radius: 50%;
+      z-index: 99999;
     `;
 
     const {
@@ -151,17 +162,47 @@ class CustomScrollbar {
     this.V_grabbedPos = 0;
 
     this.H_isGrabbed = false;
-    this.H_grabbedPos = false;
+    this.H_grabbedPos = 0;
 
+    this.is_middle_grabbed = false;
+    this.middle_pos_Y = 0;
+    this.middle_deltaY = 0;
+    this.middle_pos_X = 0;
+    this.middle_deltaX = 0;
+
+    //Middle click moving
+    this.contentPart.addEventListener("mousedown", (e) => {
+      if (e.button !== 1) return;
+
+      if (this.is_middle_grabbed) {
+        this.removeMiddleClickStarter();
+      }
+      this.is_middle_grabbed = true;
+      this.middle_pos_Y = e.clientY;
+      this.middle_pos_X = e.clientX;
+
+      this.addMiddleClickStarter(e.clientY, e.clientX);
+
+      this.animate(
+        0,
+        0,
+        {
+          isMiddle: true,
+        },
+        !this.is_middle_grabbed
+      );
+    });
+
+    //Move with grabbing the bars
     this.V_scrollBarNode.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      if (e.buttons !== 1) return;
+      if (e.button !== 0) return;
       this.V_isGrabbed = true;
       this.V_grabbedPos = e.layerY;
     });
     this.H_scrollBarNode.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      if (e.buttons !== 1) return;
+      if (e.button !== 0) return;
       this.H_isGrabbed = true;
       this.H_grabbedPos = e.layerX;
     });
@@ -171,6 +212,14 @@ class CustomScrollbar {
       const { scrollWidth, clientWidth, offsetLeft, offsetWidth } =
         this.contentPart;
 
+      //middle click mover
+      if (this.is_middle_grabbed) {
+        const differenceY = e.clientY - this.middle_pos_Y;
+        const differenceX = e.clientX - this.middle_pos_X;
+        this.middle_deltaY = differenceY;
+        this.middle_deltaX = differenceX;
+      }
+      //Check if it's vertical and assign it's correct values to the variables
       const isVertical = this.V_isGrabbed;
       if (!isVertical && !this.H_isGrabbed) return;
       const grabbedPos = isVertical ? this.V_grabbedPos : this.H_grabbedPos;
@@ -186,6 +235,7 @@ class CustomScrollbar {
         ? this.V_scrollBarNode
         : this.H_scrollBarNode;
 
+      //calculate
       const borderSize = (offsetSize - clientSize) / 2;
       const cursorPos = clientPos - offsetDirection - borderSize - grabbedPos;
       const isTooSmall = scrollNodeSize <= 40;
@@ -202,7 +252,7 @@ class CustomScrollbar {
 
       scrollBarNode.style[isVertical ? "top" : "left"] = `${newDirection}px`;
 
-      //scrollDirection
+      //scrollDirection (top, left)
       const realScrollSize = scrollSize - clientSize;
       const newScrollDirection =
         (newDirection / spaceWithoutNode) * realScrollSize;
@@ -217,6 +267,10 @@ class CustomScrollbar {
       }
       if (this.H_isGrabbed) {
         this.H_isGrabbed = false;
+      }
+      if (this.is_middle_grabbed && e.button !== 1) {
+        this.is_middle_grabbed = false;
+        this.removeMiddleClickStarter();
       }
     });
 
@@ -494,9 +548,20 @@ class CustomScrollbar {
     const node = isTop ? this.V_scrollBarNode : this.H_scrollBarNode;
 
     //Fused calls
-    this.contentPart[scrollProp] = calcScrollFn();
-    const nodePos = calcNodeFn.call(this);
-    node.style[styleProp] = `${nodePos}px`;
+    if (e.isMiddle) {
+      const directions = calcScrollFn();
+      this.contentPart.scrollTop = directions.valueY;
+      this.contentPart.scrollLeft = directions.valueX;
+      const top = this.calculateNode("top");
+      const left = this.calculateNode("left");
+
+      this.V_scrollBarNode.style.top = `${top}px`;
+      this.H_scrollBarNode.style.left = `${left}px`;
+    } else {
+      this.contentPart[scrollProp] = calcScrollFn();
+      const nodePos = calcNodeFn.call(this);
+      node.style[styleProp] = `${nodePos}px`;
+    }
   }
 
   changeScrollNode(type) {
@@ -544,7 +609,20 @@ class CustomScrollbar {
   calculateScroll(event, amount, type) {
     const { clientSize, scrollSize, scrollDirection } = this.getValues(type);
     //fused calculations
-    const value = scrollDirection + (event.deltaY < 0 ? 0 - amount : amount);
+    let value = 0;
+    if (event.isMiddle) {
+      const { scrollTop, scrollLeft, clientHeight, clientWidth } =
+        this.contentPart;
+      let valueY = scrollTop + event.deltaY / 4;
+      let valueX = scrollLeft + event.deltaX / 4;
+
+      valueY = valueY > 0 ? valueY : valueY < 0 ? 0 : scrollTop - clientHeight;
+      valueX = valueX > 0 ? valueX : valueX < 0 ? 0 : scrollLeft - clientWidth;
+
+      return { valueY, valueX };
+    } else {
+      value = scrollDirection + (event.deltaY < 0 ? 0 - amount : amount);
+    }
     const maxValue = scrollSize - clientSize;
 
     if (value > 0) {
@@ -558,16 +636,31 @@ class CustomScrollbar {
     }
   }
 
-  animate(_, current, e) {
-    const isAnimationOver = current >= this.options.SCROLL_AMOUNT;
+  animate(_, current, e, max = this.options.SCROLL_AMOUNT) {
+    const isAnimationOver = max === false ? max : current >= max;
+    let event;
+    if (e.isMiddle) {
+      event = {
+        isMiddle: e.isMiddle,
+        deltaY: this.middle_deltaY,
+        deltaX: this.middle_deltaX,
+      };
+      if (!this.is_middle_grabbed) return;
+    } else {
+      event = e;
+    }
     if (!isAnimationOver) {
-      if (e.shiftKey) {
-        this.addToScroll(e, "left");
+      if (event.isMiddle) {
+        this.addToScroll(event, "both");
+      } else if (event.shiftKey) {
+        this.addToScroll(event, "left");
       } else {
-        this.addToScroll(e, "top");
+        this.addToScroll(event, "top");
       }
       current += this.options.SCROLL_AMOUNT / 8;
-      requestAnimationFrame((timeStamp) => this.animate(timeStamp, current, e));
+      requestAnimationFrame((timeStamp) =>
+        this.animate(timeStamp, current, event, max)
+      );
     }
   }
 
@@ -587,6 +680,16 @@ class CustomScrollbar {
     const scrollDirection = isTop ? scrollTop : scrollLeft;
 
     return { clientSize, scrollSize, scrollDirection };
+  }
+
+  addMiddleClickStarter(top, left) {
+    this.middleClickStarter.style.top = `${top}px`;
+    this.middleClickStarter.style.left = `${left}px`;
+    this.contentPart.appendChild(this.middleClickStarter);
+  }
+
+  removeMiddleClickStarter() {
+    this.contentPart.removeChild(this.middleClickStarter);
   }
 }
 
