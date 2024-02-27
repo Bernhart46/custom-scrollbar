@@ -155,11 +155,13 @@ class CustomScrollbar {
 
     this.V_scrollBarNode.addEventListener("mousedown", (e) => {
       e.preventDefault();
+      if (e.buttons !== 1) return;
       this.V_isGrabbed = true;
       this.V_grabbedPos = e.layerY;
     });
     this.H_scrollBarNode.addEventListener("mousedown", (e) => {
       e.preventDefault();
+      if (e.buttons !== 1) return;
       this.H_isGrabbed = true;
       this.H_grabbedPos = e.layerX;
     });
@@ -350,6 +352,7 @@ class CustomScrollbar {
 
       element.addEventListener("mousedown", (event) => {
         event.preventDefault();
+        if (event.buttons !== 1) return;
         if (event.target === element) {
           initialStylesActive = element.style.cssText;
           element.style.cssText += styles.active;
