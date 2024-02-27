@@ -238,22 +238,42 @@ class CustomScrollbar {
     });
 
     //FOR MOBILE
-    // this.touchStartY;
 
-    // this.element.addEventListener("touchstart", (e) => {
-    //   this.touchStartY = e.touches[0].clientY;
-    // });
-    // this.element.addEventListener("touchmove", (e) => {
-    //   // e.preventDefault();
+    this.element.addEventListener("touchstart", (e) => {
+      //Refresh only when the content is on top (mobile)
+      if (this.contentPart.scrollTop > 0) {
+        e.preventDefault();
+      }
+      this.touchStartY =
+        e.touches[0].pageY -
+        this.contentPart.offsetTop +
+        this.contentPart.scrollTop;
 
-    //   this.options.SCROLL_AMOUNT = 24;
+      this.touchStartX =
+        e.touches[0].pageX -
+        this.contentPart.offsetLeft +
+        this.contentPart.scrollLeft;
+    });
+    this.element.addEventListener("touchmove", (e) => {
+      const isDone = this.touchStartY;
 
-    //   const isDone = this.touchStartY;
+      const touchPositionY =
+        e.touches[0].pageY -
+        this.contentPart.offsetTop +
+        this.contentPart.scrollTop;
+      const touchPositionX =
+        e.touches[0].pageX -
+        this.contentPart.offsetLeft +
+        this.contentPart.scrollLeft;
 
-    //   scroll({
-    //     deltaY: this.touchStartY - e.touches[0].clientY,
-    //   });
-    // });
+      const differenceY = this.touchStartY - touchPositionY;
+      const differenceX = this.touchStartX - touchPositionX;
+
+      this.contentPart.scrollTop = this.contentPart.scrollTop + differenceY;
+      this.contentPart.scrollLeft = this.contentPart.scrollLeft + differenceX;
+      this.V_scrollBarNode.style.top = this.calculateNode("top") + "px";
+      this.H_scrollBarNode.style.left = this.calculateNode("left") + "px";
+    });
 
     const keyboardSupport = (e) => {
       switch (e.key) {
