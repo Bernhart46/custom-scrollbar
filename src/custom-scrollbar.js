@@ -41,6 +41,15 @@ const DEFAULT_OPTIONS = {
   `,
   CORNER_STYLES_HOVER: ``,
   CORNER_STYLES_ACTIVE: ``,
+  MIDDLE_NAVIGATOR: `
+    width: 5px;
+    height: 5px;
+    background-color: black;
+    border-radius: 50%;
+    z-index: 99999;
+  `,
+  MIDDLE_NAVIGATOR_HOVER: ``,
+  MIDDLE_NAVIGATOR_ACTIVE: ``,
 };
 
 //It needed if I only want to change 1 variable but keep the rest
@@ -66,7 +75,7 @@ export default class CustomScrollbar {
     this.H_scrollBarNode = null;
     this.H_scrollNodeWidth = null;
 
-    this.middleClickStarter = null;
+    this.middleNavigator = null;
 
     this.isHover = false;
 
@@ -86,7 +95,7 @@ export default class CustomScrollbar {
     this.contentPart = document.createElement("div");
     this.V_scrollBarBox = document.createElement("div");
     this.V_scrollBarNode = document.createElement("div");
-    this.middleClickStarter = document.createElement("div");
+    this.middleNavigator = document.createElement("div");
 
     this.cornerNode = document.createElement("div");
 
@@ -109,21 +118,13 @@ export default class CustomScrollbar {
       height: 100%;
     `;
 
-    this.middleClickStarter.style.cssText = `
-      position:absolute;
-      width: 5px;
-      height: 5px;
-      background-color: black;
-      border-radius: 50%;
-      z-index: 99999;
-    `;
-
     const {
       VERTICAL_BOX_STYLES,
       VERTICAL_NODE_STYLES,
       HORIZONTAL_BOX_STYLES,
       HORIZONTAL_NODE_STYLES,
       CORNER_STYLES,
+      MIDDLE_NAVIGATOR,
     } = this.options;
 
     this.V_scrollBarBox.style.cssText = VERTICAL_BOX_STYLES;
@@ -384,6 +385,8 @@ export default class CustomScrollbar {
       HORIZONTAL_NODE_STYLES_HOVER,
       CORNER_STYLES_ACTIVE,
       CORNER_STYLES_HOVER,
+      MIDDLE_NAVIGATOR_ACTIVE,
+      MIDDLE_NAVIGATOR_HOVER,
     } = this.options;
 
     function setupEventListeners(element, styles, positionProperty) {
@@ -419,12 +422,14 @@ export default class CustomScrollbar {
       });
 
       window.addEventListener("mouseup", (event) => {
+        if (event.button === 1) return;
         if (element === activeElement) {
           if (element !== event.target) {
             const positionValue =
               activeElement.style[positionProperty] || "0px";
             activeElement.style.cssText = initialStylesHover;
             activeElement.style[positionProperty] = positionValue;
+
             isActive = false;
           } else {
             const positionValue =
@@ -473,6 +478,12 @@ export default class CustomScrollbar {
       },
       "left"
     );
+
+    //Middle navigator
+    setupEventListeners(this.middleNavigator, {
+      hover: MIDDLE_NAVIGATOR_HOVER,
+      active: MIDDLE_NAVIGATOR_ACTIVE,
+    });
   }
 
   changeVisibility() {
@@ -689,12 +700,16 @@ export default class CustomScrollbar {
   }
 
   addMiddleClickStarter(top, left) {
-    this.middleClickStarter.style.top = `${top}px`;
-    this.middleClickStarter.style.left = `${left}px`;
-    this.contentPart.appendChild(this.middleClickStarter);
+    const { MIDDLE_NAVIGATOR } = this.options;
+    this.middleNavigator.style.cssText = MIDDLE_NAVIGATOR;
+    this.middleNavigator.style.position = "absolute";
+    this.middleNavigator.style.translate = "-50% -50%";
+    this.middleNavigator.style.top = `${top}px`;
+    this.middleNavigator.style.left = `${left}px`;
+    this.contentPart.appendChild(this.middleNavigator);
   }
 
   removeMiddleClickStarter() {
-    this.contentPart.removeChild(this.middleClickStarter);
+    this.contentPart.removeChild(this.middleNavigator);
   }
 }

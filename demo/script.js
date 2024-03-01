@@ -25,4 +25,19 @@ new CustomScrollbar(wrapper, {
   VERTICAL_NODE_STYLES_ACTIVE: `
       background-color: red;
     `,
+  MIDDLE_NAVIGATOR: `
+    width: 10px;
+    aspect-ratio: 1;
+    background: darkgreen;
+    transition: 0.25s;
+  `,
+  MIDDLE_NAVIGATOR_HOVER: `
+    background: blue;
+    width: 25px;
+    border-radius: 50%;
+  `,
+  MIDDLE_NAVIGATOR_ACTIVE: `
+    background: red;
+    width: 30px;
+  `,
 });
