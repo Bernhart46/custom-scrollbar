@@ -30,8 +30,6 @@
 
 ## Possible features (not yet implemented)
 
-- Styling the middle click point (When you middle click a small black dot appears, I can't really explain, you know what I am talking about :D)
-- Custom cursors for the middle click feature
 - Change size by width/height with CSS (I need a very small compiler-like code for this)
 - Overlay bars (When you have the scrollbars, the content behind it is invisible, I try to solve it later AKA: not that important at the moment)
 - save the scroll position with localStorage
@@ -67,6 +65,10 @@ VERTICAL_NODE_STYLES_HOVER: "same with the hover one"
 CORNER_STYLE: "Style for the little corner square between the scrollbars"
 CORNER_STYLE_ACTIVE: "I don't think I"
 CORNER_STYLE_HOVER: "need to explain these"
+
+MIDDLE_NAVIGATOR: "This is the little dot/square that shows",
+MIDDLE_NAVIGATOR_HOVER: "when you navigate by the middle click navigator",
+MIDDLE_NAVIGATOR_ACTIVE: ""
 }
 //just create a new instance and put the element and the options into it.
 //options are optional aka: not needed if you don't want. Default styles will apply then.

@@ -706,10 +706,12 @@ export default class CustomScrollbar {
     this.middleNavigator.style.translate = "-50% -50%";
     this.middleNavigator.style.top = `${top}px`;
     this.middleNavigator.style.left = `${left}px`;
+    this.element.style.cursor = "all-scroll";
     this.contentPart.appendChild(this.middleNavigator);
   }
 
   removeMiddleClickStarter() {
     this.contentPart.removeChild(this.middleNavigator);
+    this.element.style.cursor = "default";
   }
 }
