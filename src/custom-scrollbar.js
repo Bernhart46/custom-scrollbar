@@ -213,10 +213,14 @@ export default class CustomScrollbar {
 
       //middle click mover
       if (this.is_middle_grabbed) {
-        const differenceY = e.clientY - this.middle_pos_Y;
-        const differenceX = e.clientX - this.middle_pos_X;
-        this.middle_deltaY = differenceY;
-        this.middle_deltaX = differenceX;
+        if (this.V_isElementScrollable) {
+          const differenceY = e.clientY - this.middle_pos_Y;
+          this.middle_deltaY = differenceY;
+        }
+        if (this.H_isElementScrollable) {
+          const differenceX = e.clientX - this.middle_pos_X;
+          this.middle_deltaX = differenceX;
+        }
       }
       //Check if it's vertical and assign it's correct values to the variables
       const isVertical = this.V_isGrabbed;
@@ -474,8 +478,8 @@ export default class CustomScrollbar {
   changeVisibility() {
     const { scrollHeight, scrollWidth } = this.contentPart;
     const { VERTICAL_FLOAT, SCROLL_SIZE, HORIZONTAL_FLOAT } = this.options;
-    const V_isElementScrollable = scrollHeight > this.element.offsetHeight;
-    const H_isElementScrollable = scrollWidth > this.element.offsetWidth;
+    this.V_isElementScrollable = scrollHeight > this.element.offsetHeight;
+    this.H_isElementScrollable = scrollWidth > this.element.offsetWidth;
 
     const isRight = VERTICAL_FLOAT === "right";
     const isBottom = HORIZONTAL_FLOAT === "bottom";
@@ -487,7 +491,7 @@ export default class CustomScrollbar {
       ? `1fr ${SCROLL_SIZE}px`
       : `${SCROLL_SIZE}px 1fr`;
 
-    if (V_isElementScrollable) {
+    if (this.V_isElementScrollable) {
       this.V_scrollBarBox.style.display = "block";
       this.element.style.gridTemplateColumns = V_gridValue;
 
@@ -501,7 +505,7 @@ export default class CustomScrollbar {
       this.element.style.gridTemplateColumns = "1fr";
     }
 
-    if (H_isElementScrollable) {
+    if (this.H_isElementScrollable) {
       this.H_scrollBarBox.style.display = "block";
       this.cornerNode.style.display = "block";
       this.element.style.gridTemplateRows = H_gridValue;
@@ -536,15 +540,9 @@ export default class CustomScrollbar {
     const amount = METHOD === "smooth" ? SCROLL_AMOUNT / 8 : SCROLL_AMOUNT;
 
     //Fused checks
-    const scrollProp = isTop ? "scrollTop" : "scrollLeft";
-    const styleProp = isTop ? "top" : "left";
     const calcScrollFn = isTop
       ? this.calculateScroll.bind(this, e, amount, "top")
       : this.calculateScroll.bind(this, e, amount, "left");
-    const calcNodeFn = isTop
-      ? () => this.calculateNode("top")
-      : () => this.calculateNode("left");
-    const node = isTop ? this.V_scrollBarNode : this.H_scrollBarNode;
 
     //Fused calls
     if (e.isMiddle) {
@@ -557,6 +555,14 @@ export default class CustomScrollbar {
       this.V_scrollBarNode.style.top = `${top}px`;
       this.H_scrollBarNode.style.left = `${left}px`;
     } else {
+      //Fused checks but without e.isMiddle
+      const scrollProp = isTop ? "scrollTop" : "scrollLeft";
+      const styleProp = isTop ? "top" : "left";
+      const calcNodeFn = isTop
+        ? () => this.calculateNode("top")
+        : () => this.calculateNode("left");
+      const node = isTop ? this.V_scrollBarNode : this.H_scrollBarNode;
+
       this.contentPart[scrollProp] = calcScrollFn();
       const nodePos = calcNodeFn.call(this);
       node.style[styleProp] = `${nodePos}px`;
@@ -606,7 +612,6 @@ export default class CustomScrollbar {
   }
 
   calculateScroll(event, amount, type) {
-    const { clientSize, scrollSize, scrollDirection } = this.getValues(type);
     //fused calculations
     let value = 0;
     if (event.isMiddle) {
@@ -619,9 +624,11 @@ export default class CustomScrollbar {
       valueX = valueX > 0 ? valueX : valueX < 0 ? 0 : scrollLeft - clientWidth;
 
       return { valueY, valueX };
-    } else {
-      value = scrollDirection + (event.deltaY < 0 ? 0 - amount : amount);
     }
+    const { clientSize, scrollSize, scrollDirection } = this.getValues(type);
+
+    value = scrollDirection + (event.deltaY < 0 ? 0 - amount : amount);
+
     const maxValue = scrollSize - clientSize;
 
     if (value > 0) {
