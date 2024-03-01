@@ -31,12 +31,10 @@
 ## Possible features (not yet implemented)
 
 - Styling the middle click point (When you middle click a small black dot appears, I can't really explain, you know what I am talking about :D)
-
 - Custom cursors for the middle click feature
 - Change size by width/height with CSS (I need a very small compiler-like code for this)
 - Overlay bars (When you have the scrollbars, the content behind it is invisible, I try to solve it later AKA: not that important at the moment)
 - save the scroll position with localStorage
-- Optimizations (there are some code that still calculates when it shouldn't, not that heavy calculations though)
 - ReactJS support (I will remake this into a HOC, so we can use it with ReactJS too)
 
 ## Installation
