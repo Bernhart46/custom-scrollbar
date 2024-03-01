@@ -1,5 +1,4 @@
 "use strict";
-const wrapper = document.querySelector(".wrapper");
 const METHODS = ["default", "smooth"];
 const ERROR_MESSAGES = {
   NO_ELEMENT: "No element has been added to the function!",
@@ -49,7 +48,7 @@ function makeDefaultOptions(defaults, changed) {
   return { ...defaults, ...changed };
 }
 
-class CustomScrollbar {
+export default class CustomScrollbar {
   constructor(element, options) {
     if (!element) throw new Error(ERROR_MESSAGES.NO_ELEMENT);
 
@@ -692,28 +691,3 @@ class CustomScrollbar {
     this.contentPart.removeChild(this.middleClickStarter);
   }
 }
-
-new CustomScrollbar(wrapper, {
-  SCROLL_SIZE: 16,
-  CORNER_STYLES: `
-  `,
-  CORNER_STYLES_HOVER: `
-    background-color: red;
-    cursor: pointer;
-  `,
-  CORNER_STYLES_ACTIVE: `
-    background-color: green;
-  `,
-  VERTICAL_BOX_STYLES_HOVER: `
-    background-color: blue;
-  `,
-  VERTICAL_BOX_STYLES_ACTIVE: `
-    background-color: red;
-  `,
-  VERTICAL_NODE_STYLES_HOVER: `
-    background-color: green;
-  `,
-  VERTICAL_NODE_STYLES_ACTIVE: `
-    background-color: red;
-  `,
-});
